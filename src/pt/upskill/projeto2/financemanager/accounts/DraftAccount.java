@@ -7,6 +7,10 @@ public class DraftAccount extends Account{
         super(id, name);
     }
 
+    @Override
+    public double getInterestRate() {
+        return BanksConstants.normalInterestRate();
+    }
 
 
 }
