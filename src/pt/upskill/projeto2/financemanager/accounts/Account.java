@@ -13,6 +13,8 @@ public abstract class Account {
     private long id;
     private String name;
     private String additionalInfo = "";
+    private String currency = "EUR";
+    private String accountType;
 
     private List<StatementLine> statements = new ArrayList<>();
 
@@ -21,11 +23,13 @@ public abstract class Account {
         this.name = name;
     }
 
-    public Account(long id, String name, String additionalInfo, List<StatementLine> statements) {
+    public Account(long id, String name, String additionalInfo, List<StatementLine> statements, String currency, String accountType) {
         this.id = id;
         this.name = name;
         this.additionalInfo = additionalInfo;
         this.statements = statements;
+        this.currency = currency;
+        this.accountType = accountType;
     }
 
     public static Account newAccount(File file) {
@@ -37,6 +41,7 @@ public abstract class Account {
         String additionalInfo = "";
         String accountType = "";
         List<StatementLine> statements = new ArrayList<>();
+        String currrency = "";
 
         Account account = null;
 
@@ -47,6 +52,7 @@ public abstract class Account {
                 if (line.startsWith("Account  ;")) {
                     String[] accountLineInfo = line.split(";");
                     id = Long.parseLong(accountLineInfo[1].trim());
+                    currrency = accountLineInfo[2].trim();
                     name = accountLineInfo[3].trim();
                     accountType = accountLineInfo[4].trim();
                     if (accountLineInfo.length == 6) {
@@ -98,9 +104,9 @@ public abstract class Account {
 
         // Criar a conta de acordo com o tipo de conta que é
         if (accountType.equals("DraftAccount")) {
-            account = new DraftAccount(id, name, additionalInfo, statements);
+            account = new DraftAccount(id, name, additionalInfo, statements, currrency, accountType);
         } else {
-            account = new SavingsAccount(id, name, additionalInfo, statements);
+            account = new SavingsAccount(id, name, additionalInfo, statements, currrency, accountType);
         }
 
 
@@ -109,6 +115,18 @@ public abstract class Account {
 
     public long getId() {
         return id;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 
     public List<StatementLine> getStatements() {

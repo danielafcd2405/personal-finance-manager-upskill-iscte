@@ -9,10 +9,11 @@ public class DraftAccount extends Account{
 
     public DraftAccount(long id, String name) {
         super(id, name);
+        setAccountType("DraftAccount");
     }
 
-    public DraftAccount(long id, String name, String additionalInfo, List<StatementLine> statements) {
-        super(id, name, additionalInfo, statements);
+    public DraftAccount(long id, String name, String additionalInfo, List<StatementLine> statements, String currency, String accountType) {
+        super(id, name, additionalInfo, statements, currency, accountType);
     }
 
     @Override
