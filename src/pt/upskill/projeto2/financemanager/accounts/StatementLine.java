@@ -6,53 +6,60 @@ import pt.upskill.projeto2.financemanager.date.Date;
 
 public class StatementLine {
 
+	private Date date;
+	private Date valueDate;
+	private String description;
+	private double draft;
+	private double credit;
+	private double accountingBalance;
+	private double availableBalance;
+	private Category category;
+
 	public StatementLine(Date date, Date valueDate, String description, double draft, double credit, double accountingBalance, double availableBalance, Category category) {
-		// TODO Auto-generated constructor stub
+		this.date = date;
+		this.valueDate = valueDate;
+		this.description = description;
+		this.draft = draft;
+		this.credit = credit;
+		this.accountingBalance = accountingBalance;
+		this.availableBalance = availableBalance;
+		this.category = category;
 	}
 
 	public Date getDate() {
-		// TODO Auto-generated method stub
-		return null;
+		return date;
 	}
 
 	public Date getValueDate() {
-		// TODO Auto-generated method stub
-		return null;
+		return valueDate;
 	}
 
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return description;
 	}
 
 	public double getCredit() {
-		// TODO Auto-generated method stub
-		return 0.0;
+		return credit;
 	}
 
 	public double getDraft() {
-		// TODO Auto-generated method stub
-		return 0.0;
+		return draft;
 	}
 
 	public double getAccountingBalance() {
-		// TODO Auto-generated method stub
-		return 0.0;
+		return accountingBalance;
 	}
 
 	public double getAvailableBalance() {
-		// TODO Auto-generated method stub
-		return 0.0;
+		return availableBalance;
 	}
 
 	public Category getCategory() {
-		// TODO Auto-generated method stub
-		return null;
+		return category;
 	}
 
 	public void setCategory(Category cat) {
-		// TODO Auto-generated method stub
-		
+		this.category = cat;
 	}
 
 }
