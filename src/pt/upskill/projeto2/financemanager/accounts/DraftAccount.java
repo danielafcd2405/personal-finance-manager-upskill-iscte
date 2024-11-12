@@ -18,8 +18,28 @@ public class DraftAccount extends Account{
 
     @Override
     public double estimatedAverageBalance() {
-        // TODO aplicar o cálculo da média ponderada
-        return currentBalance();
+
+        double estimatedAverageBalance = 0.0;
+
+        if (!statements.isEmpty()) {
+            // Considero o dia de hoje como sendo a data do último statement
+            Date today = statements.get(statements.size() - 1).getDate();
+            Date beginningOfYear = new Date(1, 1, today.getYear());
+
+            double sumAvailableBalance = 0;
+            for (int i = 0; i < statements.size() - 1; i++) {
+                if (statements.get(i).getDate().compareTo(beginningOfYear) >= 0 && statements.get(i).getDate().compareTo(today) <= 0) {
+                    double availableBalance = statements.get(i).getAvailableBalance();
+                    int diffInDays = statements.get(i).getDate().diffInDays(statements.get(i + 1).getDate());
+                    sumAvailableBalance += availableBalance * diffInDays;
+                }
+            }
+
+            int totalDays = today.diffInDays(beginningOfYear);
+            estimatedAverageBalance = sumAvailableBalance/totalDays;
+        }
+
+        return estimatedAverageBalance;
     }
 
     @Override

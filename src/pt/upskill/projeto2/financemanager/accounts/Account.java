@@ -16,7 +16,7 @@ public abstract class Account {
     private String currency = "EUR";
     private String accountType;
 
-    private List<StatementLine> statements = new ArrayList<>();
+    protected List<StatementLine> statements = new ArrayList<>();
 
     public Account(long id, String name) {
         this.id = id;
