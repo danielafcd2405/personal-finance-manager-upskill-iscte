@@ -4,15 +4,14 @@ import pt.upskill.projeto2.financemanager.accounts.StatementLine;
 import pt.upskill.projeto2.financemanager.date.Date;
 
 public class BeforeDateSelector implements Selector<StatementLine>{
-    // TODO
+    private Date date;
 
     public BeforeDateSelector(Date date) {
-        // TODO
+        this.date = date;
     }
 
     @Override
     public boolean isSelected(StatementLine item) {
-        // TODO
-        return false;
+        return item.getDate().compareTo(date) < 0;
     }
 }
