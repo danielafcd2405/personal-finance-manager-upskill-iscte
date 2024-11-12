@@ -111,6 +111,10 @@ public abstract class Account {
         return id;
     }
 
+    public List<StatementLine> getStatements() {
+        return statements;
+    }
+
     public String getName() {
         return name;
     }

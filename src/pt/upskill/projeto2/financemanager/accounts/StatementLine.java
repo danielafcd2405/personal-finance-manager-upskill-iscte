@@ -16,6 +16,19 @@ public class StatementLine {
 	private Category category;
 
 	public StatementLine(Date date, Date valueDate, String description, double draft, double credit, double accountingBalance, double availableBalance, Category category) {
+		if (date == null || valueDate == null) {
+			throw new IllegalArgumentException("Date and valueDate cannot be null");
+		}
+		if (description == null || description.isEmpty()) {
+			throw new IllegalArgumentException("Description cannot be null or empty");
+		}
+		if (draft > 0) {
+			throw new IllegalArgumentException("Draft amount cannot be positive");
+		}
+		if (credit < 0) {
+			throw new IllegalArgumentException("Credit amount cannot be negative");
+		}
+
 		this.date = date;
 		this.valueDate = valueDate;
 		this.description = description;
