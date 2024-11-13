@@ -3,6 +3,7 @@ package pt.upskill.projeto2.financemanager.categories;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author upSkill 2020
@@ -31,11 +32,14 @@ public class Category implements Serializable{
         List<Category> categories = new ArrayList<>();
 
         try {
-            FileInputStream fileInputStream = new FileInputStream(file);
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            categories = (ArrayList<Category>) objectInputStream.readObject();
-            objectInputStream.close();
-            fileInputStream.close();
+            // Verificar se o ficheiro não está vazio
+            if (file.length() != 0) {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                categories = (ArrayList<Category>) objectInputStream.readObject();
+                objectInputStream.close();
+                fileInputStream.close();
+            }
         } catch (Exception e) {
             System.out.println("Não foi possível ler o ficheiro das categorias");
         }

@@ -16,24 +16,23 @@ public class PersonalFinanceManager {
 
     public PersonalFinanceManager() {
         // TODO organizar e dividir em métodos mais pequenos
-        // Ler os ficheiros da pasta account_info
+
+        // Listar todos os nomes dos ficheiros na pasta account_info
         File[] files = null;
         try {
             File f = new File("account_info");
-            // Listar todos os nomes dos ficheiros na pasta account_info
             files = f.listFiles();
         }
         catch (Exception e) {
             System.out.println("Erro ao ler ficheiros na pasta 'account_info'");
         }
 
-        // Para cada ficheiro, criar uma nova conta e adicionar à lista de accounts
         if (files != null) {
             for (File file : files) {
                 if (!file.getName().equals("categories")) {
+                    // Para cada ficheiro, criar uma nova conta e adicionar à lista de accounts
                     Account account = Account.newAccount(file);
                     accounts.put(account.getId(), account);
-                    System.out.println(file.getName());
                 } else {
                     // Ler o ficheiro das categorias
                     categories.addAll(Category.readCategories(file));
@@ -41,25 +40,16 @@ public class PersonalFinanceManager {
             }
         }
 
-
-        // TODO apagar
-        imprimirContas();
-        imprimirCategorias();
-        System.out.println();
-        System.out.println("-------------------------");
-
         // Ler ficheiros da pasta statements
         File[] filesStatements = null;
         try {
             File f = new File("statements");
-            // Listar todos os nomes dos ficheiros na pasta statements
             filesStatements = f.listFiles();
         }
         catch (Exception e) {
             System.out.println("Erro ao ler ficheiros na pasta 'statements'");
         }
 
-        System.out.println("Statements");
         if (filesStatements != null) {
             for (File file2 : filesStatements) {
                 if (accounts.containsKey(readAccountID(file2))) {
@@ -70,27 +60,21 @@ public class PersonalFinanceManager {
                     Account account = Account.newAccount(file2);
                     accounts.put(account.getId(), account);
                 }
-                System.out.println(file2.getName());
             }
         }
 
-
-        // TODO apagar
-        System.out.println();
-        imprimirContas();
-
-
         for (Long key : accounts.keySet()) {
-            // Ordenar os statements adicionados
+            // Ordenar cronologicamente os statements adicionados
             Collections.sort(accounts.get(key).getStatements());
             // Remover os statements duplicados
             accounts.get(key).removeDuplicatedStatements();
+            // Categorizar automaticamente
+            accounts.get(key).autoCategorizeStatements(categories);
         }
 
         // TODO apagar
-        System.out.println();
-        System.out.println("Movimentos reordenados");
-        imprimirContas();
+        //imprimirContas();
+        //imprimirCategorias();
 
 
 
@@ -125,7 +109,6 @@ public class PersonalFinanceManager {
                 System.out.println(longStatementFormat.format(statementLine));
             }
             System.out.println();
-            System.out.println();
         }
     }
 
@@ -135,7 +118,7 @@ public class PersonalFinanceManager {
         System.out.println("Categorias");
         for (Category category : categories) {
             System.out.println(category.getName());
-            System.out.println("Tags em - " + category.getName());
+            System.out.println("Tags:");
             for (String tag : category.getTags()) {
                 System.out.println(tag);
             }
