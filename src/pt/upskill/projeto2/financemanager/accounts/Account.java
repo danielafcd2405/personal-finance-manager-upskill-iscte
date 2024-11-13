@@ -5,6 +5,7 @@ import pt.upskill.projeto2.financemanager.date.Date;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -33,14 +34,13 @@ public abstract class Account {
     }
 
     public static Account newAccount(File file) {
-        // TODO separar em métodos mais pequenos
         List<String> statementLineInfo = new ArrayList<>();
 
         long id = 0;
         String name = "";
         String additionalInfo = "";
         String accountType = "";
-        List<StatementLine> statements = new ArrayList<>();
+        List<StatementLine> statements = readAccountStatements(file);
         String currrency = "";
 
         Account account = null;
@@ -49,7 +49,7 @@ public abstract class Account {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                if (line.startsWith("Account  ;")) {
+                if (line.startsWith("Account") && line.split(";").length > 1) {
                     String[] accountLineInfo = line.split(";");
                     id = Long.parseLong(accountLineInfo[1].trim());
                     currrency = accountLineInfo[2].trim();
@@ -69,38 +69,6 @@ public abstract class Account {
             e.printStackTrace();
         }
 
-        // Adicionar os statements à conta
-        for (String statementInfo : statementLineInfo) {
-            String[] info = statementInfo.split(";");
-
-            // date
-            String[] DateInfo = info[0].trim().split("-");
-            int day = Integer.parseInt(DateInfo[0]);
-            int month = Integer.parseInt(DateInfo[1]);
-            int year = Integer.parseInt(DateInfo[2]);
-            Date date = new Date(day, month, year);
-
-            // valueDate
-            String[] valueDateInfo = info[1].trim().split("-");
-            int dayValue = Integer.parseInt(valueDateInfo[0]);
-            int monthValue = Integer.parseInt(valueDateInfo[1]);
-            int yearValue = Integer.parseInt(valueDateInfo[2]);
-            Date valueDate = new Date(dayValue, monthValue, yearValue);
-
-            String description = info[2].trim();
-            double draft = Double.parseDouble(info[3].trim());
-            double credit = Double.parseDouble(info[4].trim());
-            double accountingBalance = Double.parseDouble(info[5].trim());
-            double availableBalance = Double.parseDouble(info[6].trim());
-
-            Category category = null;
-            if (info.length == 8) {
-                category = new Category(info[7].trim());
-            }
-
-            statements.add(new StatementLine(date, valueDate, description, draft, credit, accountingBalance, availableBalance, category));
-        }
-
 
         // Criar a conta de acordo com o tipo de conta que é
         if (accountType.equals("DraftAccount")) {
@@ -111,6 +79,51 @@ public abstract class Account {
 
 
         return account;
+    }
+
+    public static List<StatementLine> readAccountStatements(File file) {
+        List<StatementLine> statements = new ArrayList<>();
+        List<String> statementLines = new ArrayList<>();
+        try {
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.split(";").length >= 7 && !line.startsWith("Date")) {
+                    statementLines.add(line);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Não foi possível ler o ficheiro");
+        }
+
+        for (String statementInfo : statementLines) {
+            statements.add(StatementLine.newStatementLine(statementInfo));
+        }
+
+        return statements;
+    }
+
+    public boolean isDuplicatedStatement(StatementLine statementLine) {
+        int counter = 0;
+        for (StatementLine statement : statements) {
+            if (statement.equals(statementLine)) {
+                counter++;
+            }
+        }
+        if (counter > 1) {
+            return true;
+        }
+        return false;
+    }
+
+    public void removeDuplicatedStatements() {
+        Iterator<StatementLine> iterator = statements.iterator();
+        while (iterator.hasNext()) {
+            StatementLine statementLine = iterator.next();
+            if (isDuplicatedStatement(statementLine)) {
+                iterator.remove();
+            }
+        }
     }
 
     public long getId() {
