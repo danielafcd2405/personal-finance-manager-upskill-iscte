@@ -13,6 +13,9 @@ public class PersonalFinanceManager {
     private Map<Long, Account> accounts = new HashMap<>();
     private List<Category> categories = new ArrayList<>();
 
+    public Map<Long, Account> getAccounts() {
+        return accounts;
+    }
 
     public PersonalFinanceManager() {
         // TODO organizar e dividir em métodos mais pequenos

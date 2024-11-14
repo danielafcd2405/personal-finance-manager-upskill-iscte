@@ -226,6 +226,19 @@ public abstract class Account {
         return totalForMonth;
     }
 
+    public double totalForMonthCredit(int month, int year) {
+        // Somar os credits do mês correspondente
+        double totalForMonthCredit = 0;
+        Date startOfMonth = new Date(1, month, year);
+        Date endOfMonth = Date.endOfMonth(startOfMonth);
+        for (StatementLine statementLine : statements) {
+            if (statementLine.getDate().compareTo(startOfMonth) >= 0 && statementLine.getDate().compareTo(endOfMonth) <= 0) {
+                totalForMonthCredit += statementLine.getCredit();
+            }
+        }
+        return totalForMonthCredit;
+    }
+
     public void autoCategorizeStatements(List<Category> categories) {
         // Se a description do statement for igual à tag de alguma categoria, essa categoria é adicionada ao statement
         for (StatementLine statementLine : statements) {

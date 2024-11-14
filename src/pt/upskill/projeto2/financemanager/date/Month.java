@@ -9,3 +9,4 @@ package pt.upskill.projeto2.financemanager.date;
 public enum Month {
     NONE, JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER
 }
+
