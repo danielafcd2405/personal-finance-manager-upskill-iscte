@@ -2,9 +2,12 @@ package pt.upskill.projeto2.financemanager.gui;
 
 import pt.upskill.projeto2.financemanager.PersonalFinanceManager;
 import pt.upskill.projeto2.financemanager.accounts.Account;
+import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.utils.Menu;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * @author upSkill 2020
@@ -36,31 +39,30 @@ public class PersonalFinanceManagerUserInterface {
     private static final String[] OPTIONS = {OPT_GLOBAL_POSITION,
             OPT_ACCOUNT_STATEMENT, OPT_LIST_CATEGORIES, OPT_ANALISE, OPT_EXIT};
 
+    public static final Scanner scanner = new Scanner(System.in);
+
     private PersonalFinanceManager personalFinanceManager;
 
 
     public void execute() {
-
-        // TODO
-        mainMenu(personalFinanceManager.getAccounts());
-
+        mainMenu(personalFinanceManager.getAccounts(), personalFinanceManager.getCategories());
     }
 
-    private void mainMenu(Map<Long, Account> accounts) {
+    public static void mainMenu(Map<Long, Account> accounts, List<Category> categories) {
         String option = Menu.requestSelection("Menu Inicial", OPTIONS);
         if (option != null) {
             switch (option) {
                 case OPT_GLOBAL_POSITION:
-                    Views.globalPositionView(accounts);
+                    Views.globalPositionView(accounts, categories);
                     break;
                 case OPT_ACCOUNT_STATEMENT:
-                    accountStatementMenu(accounts);
+                    accountStatementMenu(accounts, categories);
                     break;
                 case OPT_LIST_CATEGORIES:
-                    // TODO
+                    Views.listCategoriesView(categories);
                     break;
                 case OPT_ANALISE:
-                    analysisMenu(accounts);
+                    analysisMenu(accounts, categories);
                     break;
                 case OPT_EXIT:
                     // TODO mostrar mensagem de despedida
@@ -69,51 +71,51 @@ public class PersonalFinanceManagerUserInterface {
         }
     }
 
-    private void accountStatementMenu(Map<Long, Account> accounts) {
+    public static void accountStatementMenu(Map<Long, Account> accounts, List<Category> categories) {
         String option = Menu.requestSelection(OPT_ACCOUNT_STATEMENT, createOptionsAccountId(accounts));
         if (option!= null && !option.equals(OPT_RETURN_MAIN_MENU)) {
             String[] s = option.split(" - ");
             long key = Long.parseLong(s[0].trim());
-            Views.accountStatementsView(accounts.get(key));
+            Views.accountStatementsView(key, accounts, categories);
         } else {
-            mainMenu(accounts);
+            mainMenu(accounts, categories);
         }
     }
 
-    private void analysisMenu(Map<Long, Account> accounts) {
+    public static void analysisMenu(Map<Long, Account> accounts, List<Category> categories) {
         String option = Menu.requestSelection(OPT_ANALISE, OPTIONS_ANALYSIS);
         if (option != null) {
             switch (option) {
                 case OPT_MONTHLY_SUMMARY:
-                    Views.monthlySummary(accounts);
+                    Views.monthlySummaryView(accounts, categories);
                     break;
                 case OPT_PREDICTION_PER_CATEGORY:
-                    predictionPerCategoryMenu(accounts);
+                    predictionPerCategoryMenu(accounts, categories);
                     break;
                 case OPT_ANUAL_INTEREST:
-                    // TODO
+                    Views.annualInterestView(accounts);
                     break;
                 case OPT_RETURN_MAIN_MENU:
-                    mainMenu(accounts);
+                    mainMenu(accounts, categories);
                     break;
             }
         } else {
-            mainMenu(accounts);
+            mainMenu(accounts, categories);
         }
     }
 
-    private void predictionPerCategoryMenu(Map<Long, Account> accounts) {
+    public static void predictionPerCategoryMenu(Map<Long, Account> accounts, List<Category> categories) {
         String option = Menu.requestSelection(OPT_PREDICTION_PER_CATEGORY, createOptionsAccountId(accounts));
         if (option != null && !option.equals(OPT_RETURN_MAIN_MENU)) {
             String[] s = option.split(" - ");
             long key = Long.parseLong(s[0].trim());
             Views.predictionPerCategoryView(accounts.get(key));
         } else {
-            analysisMenu(accounts);
+            analysisMenu(accounts, categories);
         }
     }
 
-    private String[] createOptionsAccountId(Map<Long, Account> accounts) {
+    public static String[] createOptionsAccountId(Map<Long, Account> accounts) {
         int numberOfAccounts = accounts.size();
         String[] OPTIONS_ACCOUNT_ID = new String[numberOfAccounts + 1];
         int i = 0;
@@ -125,6 +127,7 @@ public class PersonalFinanceManagerUserInterface {
         OPTIONS_ACCOUNT_ID[OPTIONS_ACCOUNT_ID.length - 1] = OPT_RETURN_MAIN_MENU;
         return OPTIONS_ACCOUNT_ID;
     }
+
 
 
 }

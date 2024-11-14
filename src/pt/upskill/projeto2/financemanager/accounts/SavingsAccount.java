@@ -31,16 +31,14 @@ public class SavingsAccount extends Account{
 
     @Override
     public void autoCategorizeStatements(List<Category> categories) {
+        if (categories.isEmpty()) {
+            categories.add(savingsCategory);
+        }
         // As contas poupança categorizam automaticamente todos os seus movimentos como "SAVINGS"
         for (StatementLine statementLine : getStatements()) {
             statementLine.setCategory(savingsCategory);
-            savingsCategory.addTag(statementLine.getDescription());
         }
     }
 
-    @Override
-    public void addStatementLine(StatementLine statementLine) {
-        super.addStatementLine(statementLine);
-        autoCategorizeStatements(null);
-    }
+
 }

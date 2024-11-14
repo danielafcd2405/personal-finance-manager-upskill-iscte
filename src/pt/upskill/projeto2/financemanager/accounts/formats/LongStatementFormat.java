@@ -10,7 +10,6 @@ public class LongStatementFormat implements StatementLineFormat{
 
     @Override
     public String format(StatementLine objectToFormat) {
-        // TODO assertEquals("02-01-2014 \t03-01-2014 \tdescription ... \t-10.0 \t220.0 \t1500.0 \t1730.0", f.format(s2));
         return objectToFormat.getDate().toString() +
                 " \t" + objectToFormat.getValueDate().toString() +
                 " \t" + objectToFormat.getDescription() +

@@ -19,6 +19,7 @@ public class DraftAccount extends Account{
 
     @Override
     public double estimatedAverageBalance() {
+        // TODO corrigir método
 
         double estimatedAverageBalance = 0.0;
 

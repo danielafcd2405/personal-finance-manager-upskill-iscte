@@ -61,9 +61,8 @@ public abstract class Account {
                 } else if (line.split(";").length >= 7 && !line.startsWith("Date")) {
                     statementLineInfo.add(line);
                 }
-
             }
-
+            scanner.close();
         } catch (Exception e) {
             System.out.println("Não foi possível ler o ficheiro da conta");
             e.printStackTrace();
@@ -92,6 +91,7 @@ public abstract class Account {
                     statementLines.add(line);
                 }
             }
+            scanner.close();
         } catch (Exception e) {
             System.out.println("Não foi possível ler o ficheiro");
         }

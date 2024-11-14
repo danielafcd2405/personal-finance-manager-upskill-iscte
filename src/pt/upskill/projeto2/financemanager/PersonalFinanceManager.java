@@ -17,6 +17,10 @@ public class PersonalFinanceManager {
         return accounts;
     }
 
+    public List<Category> getCategories() {
+        return categories;
+    }
+
     public PersonalFinanceManager() {
         // TODO organizar e dividir em métodos mais pequenos
 
@@ -94,6 +98,7 @@ public class PersonalFinanceManager {
                     id = Long.parseLong(line.split(";")[1].trim());
                 }
             }
+            scanner.close();
         } catch (Exception e) {
             System.out.println("Não foi possível ler o ficheiro dos movimentos de conta");
         }
@@ -119,7 +124,8 @@ public class PersonalFinanceManager {
     public void imprimirCategorias() {
         // TODO apagar
         System.out.println("Categorias");
-        for (Category category : categories) {
+        List<Category> categorias = Category.readCategories(new File("account_info_test/categories"));
+        for (Category category : categorias) {
             System.out.println(category.getName());
             System.out.println("Tags:");
             for (String tag : category.getTags()) {
