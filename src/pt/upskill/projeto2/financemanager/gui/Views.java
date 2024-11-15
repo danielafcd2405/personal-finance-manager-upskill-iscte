@@ -9,7 +9,6 @@ import pt.upskill.projeto2.financemanager.date.Month;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class Views {
     // Methods static para mostrar as informações pedidas no terminal
@@ -70,14 +69,17 @@ public class Views {
         }
 
         System.out.println();
-        System.out.println("Introduza 'T' para adicionar uma nova tag a uma categoria existente");
-        System.out.println("Introduza 'C' para adicionar uma nova categoria");
+        System.out.println("Introduza 'C' para adicionar um movimento a uma categoria");
         System.out.println("Pressione 'ENTER' para regressar ao Menu Movimentos de Conta");
 
-        PersonalFinanceManagerUserInterface.scanner.nextLine();
+        String userInput = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
         System.out.println(lineBreaks);
-        PersonalFinanceManagerUserInterface.accountStatementMenu(accounts, categories);
-        // TODO
+
+        if (userInput.equals("C")) {
+            PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_ACCOUNT_STATEMENT, key);
+        } else {
+            PersonalFinanceManagerUserInterface.accountStatementChooseAccountMenu(accounts, categories);
+        }
     }
 
 
@@ -138,9 +140,7 @@ public class Views {
     }
 
 
-    public static void listCategoriesView(List<Category> categories) {
-        // TODO
-        // Header
+    public static void listCategoriesView(Map<Long, Account> accounts, List<Category> categories) {
         System.out.println(separator1);
         System.out.println("\tLISTAR CATEGORIAS");
         System.out.println(separator1);
@@ -157,8 +157,15 @@ public class Views {
 
         System.out.println("Introduza 'E' para editar as categorias");
         System.out.println("Pressione 'ENTER' para regressar ao Menu Inicial");
-        
+        String userInput = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+        System.out.println(lineBreaks);
+        if (userInput.equals("E")) {
+            PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_LIST_CATEGORIES, 0);
+        } else {
+            PersonalFinanceManagerUserInterface.mainMenu(accounts, categories);
+        }
     }
+
 
 
 }
