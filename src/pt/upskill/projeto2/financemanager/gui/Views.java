@@ -112,14 +112,14 @@ public class Views {
                     }
                     double totalDrafts = account.totalForMonth(month, year);
                     double totalCredits = account.totalForMonthCredit(month, year);
-                    System.out.println("\t" + Month.values()[month] + " \t" + totalDrafts + " \t" + totalCredits + " \t" + (totalDrafts + totalCredits));
+                    double monthlyBalance = Math.round((totalDrafts + totalCredits) * 100)/100.0;
+                    //double valorArredondado = Math.round(numero * Math.pow(10, casasDec)) / (Math.pow(10, casasDec));
+                    System.out.println("\t" + Month.values()[month] + " \t" + totalDrafts + " \t" + totalCredits + " \t" + monthlyBalance);
                 }
                 System.out.println();
             }
             System.out.println(separator2);
 
-            // TODO arredondar resultado do balanço mensal
-            // TODO Alterar cores: vermelho para débitos e verde para créditos
         }
 
         System.out.println();
@@ -131,7 +131,6 @@ public class Views {
 
 
     public static void predictionPerCategoryView(Map<Long, Account> accounts, List<Category> categories, Account account) {
-        // TODO
         // Mostra os drafts totais deste mês, para cada categoria
         System.out.println(separator1);
         System.out.println("\tPREVISÃO DE GASTOS TOTAIS DESTE MÊS, POR CATEGORIA");
@@ -147,8 +146,7 @@ public class Views {
         System.out.println("Categoria \tDébitos até à data atual \tPrevisão de débitos até ao final do mês");
         for (Category category : categories) {
             double totalDraftsForCategory = account.totalDraftsForCategorySince(category, beginningOfMonth);
-            double totalPredictedDrafts = totalDraftsForCategory / days * totalDays;
-            // TODO arredondar valor de totalPredictedDrafts
+            double totalPredictedDrafts = Math.round(totalDraftsForCategory / days * totalDays * 100)/100.0;
             System.out.println(category.getName() + " \t" + totalDraftsForCategory + " \t" + totalPredictedDrafts);
         }
 
@@ -169,10 +167,9 @@ public class Views {
 
         for (Long key : accounts.keySet()) {
             Account account = accounts.get(key);
-            double estimatedAverageBalance = account.estimatedAverageBalance();
-            double interestRate = account.getInterestRate();
-            double interests = estimatedAverageBalance * interestRate;
-            // TODO arredondar os valores
+            double estimatedAverageBalance = Math.round(account.estimatedAverageBalance() * 100) / 100.0;
+            double interestRate = Math.round(account.getInterestRate() * 100) / 100.0;
+            double interests = Math.round(estimatedAverageBalance * interestRate * 100) / 100.0;
             System.out.println(account.getId() + " \t" + estimatedAverageBalance + " \t" + interestRate + " \t" + interests);
         }
         System.out.println();

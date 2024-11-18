@@ -77,7 +77,6 @@ public class PersonalFinanceManagerUserInterface {
     }
 
     public static void saveChangesConfirmationBox(Map<Long, Account> accounts, List<Category> categories) {
-        // TODO
         if (Menu.yesOrNoInput("Deseja guardar as alterações realizadas?")) {
             Category.writeCategories(new File("account_info/categories"), categories);
             for (Long key : accounts.keySet()) {
