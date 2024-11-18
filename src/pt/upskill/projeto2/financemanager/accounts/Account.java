@@ -1,9 +1,11 @@
 package pt.upskill.projeto2.financemanager.accounts;
 
+import pt.upskill.projeto2.financemanager.accounts.formats.FileAccountFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.date.Date;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,16 +36,12 @@ public abstract class Account {
     }
 
     public static Account newAccount(File file) {
-        List<String> statementLineInfo = new ArrayList<>();
-
         long id = 0;
         String name = "";
         String additionalInfo = "";
         String accountType = "";
         List<StatementLine> statements = readAccountStatements(file);
         String currrency = "";
-
-        Account account = null;
 
         try {
             Scanner scanner = new Scanner(file);
@@ -58,24 +56,20 @@ public abstract class Account {
                     if (accountLineInfo.length == 6) {
                         additionalInfo = accountLineInfo[5];
                     }
-                } else if (line.split(";").length >= 7 && !line.startsWith("Date")) {
-                    statementLineInfo.add(line);
                 }
             }
             scanner.close();
         } catch (Exception e) {
             System.out.println("Não foi possível ler o ficheiro da conta");
-            e.printStackTrace();
         }
 
-
+        Account account;
         // Criar a conta de acordo com o tipo de conta que é
         if (accountType.equals("DraftAccount")) {
             account = new DraftAccount(id, name, additionalInfo, statements, currrency, accountType);
         } else {
             account = new SavingsAccount(id, name, additionalInfo, statements, currrency, accountType);
         }
-
 
         return account;
     }
@@ -101,6 +95,17 @@ public abstract class Account {
         }
 
         return statements;
+    }
+
+    public static void writeAccountInfo(Account account) {
+        try {
+            PrintWriter printWriter = new PrintWriter("account_info/" + account.getId() + ".csv");
+            FileAccountFormat fileAccountFormat = new FileAccountFormat();
+            printWriter.println(fileAccountFormat.format(account));
+            printWriter.close();
+        } catch (Exception e) {
+            System.out.println("Não foi possível escrever o ficheiro");
+        }
     }
 
     public boolean isDuplicatedStatement(StatementLine statementLine) {

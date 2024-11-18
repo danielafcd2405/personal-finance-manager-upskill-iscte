@@ -175,6 +175,11 @@ public class Views {
             // TODO arredondar os valores
             System.out.println(account.getId() + " \t" + estimatedAverageBalance + " \t" + interestRate + " \t" + interests);
         }
+        System.out.println();
+        System.out.println("Pressione 'ENTER' para regressar ao Menu Análise");
+        PersonalFinanceManagerUserInterface.scanner.nextLine();
+        System.out.println(lineBreaks);
+        PersonalFinanceManagerUserInterface.analysisMenu(accounts, categories);
 
     }
 

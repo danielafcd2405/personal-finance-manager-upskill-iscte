@@ -5,6 +5,7 @@ import pt.upskill.projeto2.financemanager.accounts.Account;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.utils.Menu;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -69,8 +70,18 @@ public class PersonalFinanceManagerUserInterface {
                     analysisMenu(accounts, categories);
                     break;
                 case OPT_EXIT:
-                    // TODO gravar dados confirmação
+                    saveChangesConfirmationBox(accounts, categories);
                     break;
+            }
+        }
+    }
+
+    public static void saveChangesConfirmationBox(Map<Long, Account> accounts, List<Category> categories) {
+        // TODO
+        if (Menu.yesOrNoInput("Deseja guardar as alterações realizadas?")) {
+            Category.writeCategories(new File("account_info/categories"), categories);
+            for (Long key : accounts.keySet()) {
+                Account.writeAccountInfo(accounts.get(key));
             }
         }
     }
