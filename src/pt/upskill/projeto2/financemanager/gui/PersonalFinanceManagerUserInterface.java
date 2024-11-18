@@ -5,10 +5,7 @@ import pt.upskill.projeto2.financemanager.accounts.Account;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.utils.Menu;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * @author upSkill 2020
@@ -100,7 +97,7 @@ public class PersonalFinanceManagerUserInterface {
                     predictionPerCategoryChooseAccountMenu(accounts, categories);
                     break;
                 case OPT_ANUAL_INTEREST:
-                    Views.annualInterestView(accounts);
+                    Views.annualInterestView(accounts, categories);
                     break;
             }
         } else {
@@ -113,7 +110,7 @@ public class PersonalFinanceManagerUserInterface {
         if (option != null && !option.isEmpty()) {
             String[] s = option.split(" - ");
             long key = Long.parseLong(s[0].trim());
-            Views.predictionPerCategoryView(accounts.get(key));
+            Views.predictionPerCategoryView(accounts, categories, accounts.get(key));
         }else {
             analysisMenu(accounts, categories);
         }
@@ -161,7 +158,7 @@ public class PersonalFinanceManagerUserInterface {
         String tag = Menu.requestInput("Introduza a tag que deseja adicionar:").toUpperCase();
         if (hasTagInCategoryList(categories, tag)) {
             // Não pode adicionar uma tag que já está a ser usada
-            // TODO mensagem de erro
+            Menu.showMessage("Erro", "Essa tag já está a ser utilizada noutro sítio.");
         } else {
             for (Category category : categories) {
                 if (category.getName().equals(categoryName)) {
@@ -195,30 +192,51 @@ public class PersonalFinanceManagerUserInterface {
     }
 
     public static void deleteTagConfirmationBox(Map<Long, Account> accounts, List<Category> categories, String categoryName, String callingView, long key, String option) {
-        // TODO remover categoria das statementLines com a descrição correspondente à tag eliminada
-
-        for (Category category : categories) {
-            if (category.getName().equals(categoryName)) {
-                category.getTags().remove(option);
+        if (Menu.yesOrNoInput("Tem a certeza que deseja eliminar a tag " + option + "?")) {
+            for (Category category : categories) {
+                if (category.getName().equals(categoryName)) {
+                    category.getTags().remove(option);
+                }
             }
+            // Atualizar as categorias das statementLines
+            for (Long accountKey : accounts.keySet()) {
+                accounts.get(accountKey).removeCategoryFromStatement(categories, option, null);
+            }
+            editCategoryMenu(accounts, categories, categoryName, callingView, key);
+        } else {
+            deleteTagSelectionBox(accounts, categories, categoryName, callingView, key);
         }
+
+
     }
 
     public static void deleteCategoryConfirmationBox(Map<Long, Account> accounts, List<Category> categories, String categoryName, String callingView, long key) {
-        // TODO
-        // Não é possível eliminar a categoria SAVINGS
-        // Se não é possível eliminar a categoria SAVINGS a opção nem deveria aparecer...
-        // Remover a categoria das statementLines
+        if (Menu.yesOrNoInput("Tem a certeza que deseja eliminar esta categoria?")) {
+            Iterator<Category> iterator = categories.iterator();
+            while (iterator.hasNext()) {
+                Category category = iterator.next();
+                if (category.getName().equals(categoryName)) {
+                    iterator.remove();
+                }
+            }
+            // Atualizar as categorias das statementLines
+            for (Long accountKey : accounts.keySet()) {
+                accounts.get(accountKey).removeCategoryFromStatement(categories, null, categoryName);
+            }
+            editCategoriesChooseCategoryMenu(accounts, categories, callingView, key);
+        } else {
+            editCategoryMenu(accounts, categories, categoryName, callingView, key);
+        }
     }
 
     public static void addCategoryInputBox(Map<Long, Account> accounts, List<Category> categories, String callingView, long key) {
         String newCategory = Menu.requestInput("Introduza o nome da categoria que deseja adicionar:").toUpperCase();
         if (!categoryExists(categories, newCategory)) {
             categories.add(new Category(newCategory));
-            editCategoriesChooseCategoryMenu(accounts, categories, callingView, key);
         } else {
-            // TODO mensagem de erro
+            Menu.showMessage("Erro", "Já existe uma categoria com esse nome.");
         }
+        editCategoriesChooseCategoryMenu(accounts, categories, callingView, key);
     }
 
     public static boolean categoryExists(List<Category> categories, String categoryName) {

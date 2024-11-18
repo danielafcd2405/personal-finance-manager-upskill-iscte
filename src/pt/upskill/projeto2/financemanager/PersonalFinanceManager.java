@@ -79,10 +79,6 @@ public class PersonalFinanceManager {
             accounts.get(key).autoCategorizeStatements(categories);
         }
 
-        // TODO apagar
-        //imprimirContas();
-        //imprimirCategorias();
-
 
 
     }
@@ -106,33 +102,5 @@ public class PersonalFinanceManager {
     }
 
 
-
-    public void imprimirContas() {
-        // TODO apagar
-        for (Long key : accounts.keySet()) {
-            System.out.println("Account: " + accounts.get(key).getId() + " - " + accounts.get(key).getName());
-            LongStatementFormat longStatementFormat = new LongStatementFormat();
-            System.out.println(longStatementFormat.fields());
-            for (StatementLine statementLine : accounts.get(key).getStatements()) {
-                System.out.println(longStatementFormat.format(statementLine));
-            }
-            System.out.println();
-        }
-    }
-
-
-    public void imprimirCategorias() {
-        // TODO apagar
-        System.out.println("Categorias");
-        List<Category> categorias = Category.readCategories(new File("account_info_test/categories"));
-        for (Category category : categorias) {
-            System.out.println(category.getName());
-            System.out.println("Tags:");
-            for (String tag : category.getTags()) {
-                System.out.println(tag);
-            }
-            System.out.println("--------------");
-        }
-    }
 
 }

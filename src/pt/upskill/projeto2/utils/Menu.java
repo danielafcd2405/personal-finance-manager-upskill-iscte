@@ -27,5 +27,8 @@ public class Menu {
 
     // Mostrar mensagens
     // TODO
+    public static void showMessage(String title, String message){
+        JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
+    }
 
 }

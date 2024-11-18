@@ -69,13 +69,13 @@ public class Views {
         }
 
         System.out.println();
-        System.out.println("Introduza 'C' para adicionar um movimento a uma categoria");
+        System.out.println("Introduza 'E' para editar as categorias");
         System.out.println("Pressione 'ENTER' para regressar ao Menu Movimentos de Conta");
 
         String userInput = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
         System.out.println(lineBreaks);
 
-        if (userInput.equals("C")) {
+        if (userInput.equals("E")) {
             PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_ACCOUNT_STATEMENT, key);
         } else {
             PersonalFinanceManagerUserInterface.accountStatementChooseAccountMenu(accounts, categories);
@@ -130,13 +130,52 @@ public class Views {
     }
 
 
-    public static void predictionPerCategoryView(Account account) {
+    public static void predictionPerCategoryView(Map<Long, Account> accounts, List<Category> categories, Account account) {
         // TODO
+        // Mostra os drafts totais deste mês, para cada categoria
+        System.out.println(separator1);
+        System.out.println("\tPREVISÃO DE GASTOS TOTAIS DESTE MÊS, POR CATEGORIA");
+        System.out.println(separator1);
+        System.out.println();
+
+        // Considero que este mês, é o mês do último statement da conta
+        Date beginningOfMonth = Date.firstOfMonth(account.getEndDate());
+        Date endOfMonth = Date.endOfMonth(account.getEndDate());
+        int days = beginningOfMonth.diffInDays(account.getEndDate());
+        int totalDays = beginningOfMonth.diffInDays(endOfMonth);
+
+        System.out.println("Categoria \tDébitos até à data atual \tPrevisão de débitos até ao final do mês");
+        for (Category category : categories) {
+            double totalDraftsForCategory = account.totalDraftsForCategorySince(category, beginningOfMonth);
+            double totalPredictedDrafts = totalDraftsForCategory / days * totalDays;
+            // TODO arredondar valor de totalPredictedDrafts
+            System.out.println(category.getName() + " \t" + totalDraftsForCategory + " \t" + totalPredictedDrafts);
+        }
+
+        System.out.println();
+        System.out.println("Pressione 'ENTER' para regressar ao Menu Seleção de Conta");
+        PersonalFinanceManagerUserInterface.scanner.nextLine();
+        System.out.println(lineBreaks);
+        PersonalFinanceManagerUserInterface.predictionPerCategoryChooseAccountMenu(accounts, categories);
     }
 
 
-    public static void annualInterestView(Map<Long, Account> accounts) {
-        // TODO
+    public static void annualInterestView(Map<Long, Account> accounts, List<Category> categories) {
+        System.out.println(separator1);
+        System.out.println("\tPREVISÃO DE JUROS ANUAIS");
+        System.out.println(separator1);
+        System.out.println();
+        System.out.println("Número de conta \tSaldo médio estimado \tTaxa de juros \t Previsão de juros anuais");
+
+        for (Long key : accounts.keySet()) {
+            Account account = accounts.get(key);
+            double estimatedAverageBalance = account.estimatedAverageBalance();
+            double interestRate = account.getInterestRate();
+            double interests = estimatedAverageBalance * interestRate;
+            // TODO arredondar os valores
+            System.out.println(account.getId() + " \t" + estimatedAverageBalance + " \t" + interestRate + " \t" + interests);
+        }
+
     }
 
 

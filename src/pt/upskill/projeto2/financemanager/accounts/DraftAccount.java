@@ -30,25 +30,42 @@ public class DraftAccount extends Account{
 
             // Lista de movimentos anteriores ao início do ano
             List<StatementLine> previousYearStatements = new ArrayList<>();
+            // Lista de movimentos deste ano
+            List<StatementLine> currentYearStatements = new ArrayList<>();
             for (StatementLine statementLine : statements) {
                 if (statementLine.getDate().compareTo(beginningOfYear) < 0) {
                     previousYearStatements.add(statementLine);
+                } else {
+                    currentYearStatements.add(statementLine);
                 }
             }
 
-            // Available balance na conta desde o início do ano
+            double sumAccountingBalance = 0;
+            double startingAccountingBalance;
 
-            double sumAvailableBalance = 0;
-            for (int i = 0; i < statements.size() - 1; i++) {
-                if (statements.get(i).getDate().compareTo(beginningOfYear) >= 0 && statements.get(i).getDate().compareTo(today) <= 0) {
-                    double availableBalance = statements.get(i).getAvailableBalance();
-                    int diffInDays = statements.get(i).getDate().diffInDays(statements.get(i + 1).getDate());
-                    sumAvailableBalance += availableBalance * diffInDays;
+            for (int i = 0; i < currentYearStatements.size() - 1; i++) {
+                if (i == 0) {
+                    // Accounting balance na conta desde o início do ano
+                    if (!previousYearStatements.isEmpty()) {
+                        startingAccountingBalance = previousYearStatements.get(previousYearStatements.size()-1).getAccountingBalance();
+                        int diffInDays = currentYearStatements.get(i).getDate().diffInDays(beginningOfYear);
+                        sumAccountingBalance += startingAccountingBalance * diffInDays;
+                    }
+                    double accountingBalance = currentYearStatements.get(i).getAvailableBalance();
+                    int diffInDays = currentYearStatements.get(i).getDate().diffInDays(currentYearStatements.get(i + 1).getDate());
+                    sumAccountingBalance += accountingBalance * diffInDays;
+                } else if (i != 0 && i != currentYearStatements.size() - 1){
+                    double accountingBalance = currentYearStatements.get(i).getAvailableBalance();
+                    int diffInDays = currentYearStatements.get(i).getDate().diffInDays(currentYearStatements.get(i + 1).getDate());
+                    sumAccountingBalance += accountingBalance * diffInDays;
+                } else {
+                    // Para o último statement
+                    sumAccountingBalance += currentYearStatements.get(i).getAccountingBalance();
                 }
             }
 
             int totalDays = today.diffInDays(beginningOfYear);
-            estimatedAverageBalance = sumAvailableBalance/totalDays;
+            estimatedAverageBalance = sumAccountingBalance/totalDays;
         }
 
         return estimatedAverageBalance;

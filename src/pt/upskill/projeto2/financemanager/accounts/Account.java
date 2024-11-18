@@ -188,6 +188,9 @@ public abstract class Account {
     public abstract double getInterestRate();
 
     public void addStatementLine(StatementLine statementLine) {
+        if (this.accountType.equals("SavingsAccount")) {
+            statementLine.setCategory(SavingsAccount.savingsCategory);
+        }
         statements.add(statementLine);
     }
 
@@ -243,11 +246,28 @@ public abstract class Account {
         // Se a description do statement for igual à tag de alguma categoria, essa categoria é adicionada ao statement
         for (StatementLine statementLine : statements) {
             for (Category category : categories) {
-                List<String> tags = category.getTags();
-                for (String tag : tags) {
+                for (String tag : category.getTags()) {
                     if (statementLine.getDescription().equals(tag)) {
                         statementLine.setCategory(category);
                     }
+                }
+            }
+        }
+    }
+
+    public void removeCategoryFromStatement(List<Category> categories, String tag, String categoryName) {
+        if (tag != null) {
+            // Se for uma tag que foi removida
+            for (StatementLine statementLine : statements) {
+                if (statementLine.getDescription().equals(tag)) {
+                    statementLine.setCategory(null);
+                }
+            }
+        } else if (categoryName != null) {
+            // Se foi uma categoria que foi removida
+            for (StatementLine statementLine : statements) {
+                if (statementLine.getCategory() != null && statementLine.getCategory().getName().equals(categoryName)) {
+                    statementLine.setCategory(null);
                 }
             }
         }
