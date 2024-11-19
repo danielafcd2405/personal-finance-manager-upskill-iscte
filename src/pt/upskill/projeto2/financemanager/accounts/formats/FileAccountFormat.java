@@ -21,7 +21,7 @@ public class FileAccountFormat implements Format<Account> {
                     statementLine.getAvailableBalance() + nl;
         }
 
-        return "Account Info - " + new Date().toString() + nl
+        return "Account Info - " + new Date() + nl
                 + "Account  ;" + objectToFormat.getId() + " ; " + objectToFormat.getCurrency() + "  ;" + objectToFormat.getName() + " ;" + objectToFormat.getAccountType() + " ;" + nl
                 + "Start Date ;" + objectToFormat.getStartDate().toString() + nl
                 + "End Date ;" + objectToFormat.getEndDate().toString() + nl

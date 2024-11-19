@@ -6,23 +6,23 @@ import pt.upskill.projeto2.financemanager.date.Date;
 
 public class StatementLine implements Comparable<StatementLine> {
 
-	private Date date;
-	private Date valueDate;
-	private String description;
-	private double draft;
-	private double credit;
-	private double accountingBalance;
-	private double availableBalance;
+	private final Date date;
+	private final Date valueDate;
+	private final String description;
+	private final double draft;
+	private final double credit;
+	private final double accountingBalance;
+	private final double availableBalance;
 	private Category category;
 
 	public static StatementLine newStatementLine(String statementInfo) {
 		String[] info = statementInfo.split(";");
 
 		// date
-		String[] DateInfo = info[0].trim().split("-");
-		int day = Integer.parseInt(DateInfo[0]);
-		int month = Integer.parseInt(DateInfo[1]);
-		int year = Integer.parseInt(DateInfo[2]);
+		String[] dateInfo = info[0].trim().split("-");
+		int day = Integer.parseInt(dateInfo[0]);
+		int month = Integer.parseInt(dateInfo[1]);
+		int year = Integer.parseInt(dateInfo[2]);
 		Date date = new Date(day, month, year);
 
 		// valueDate
@@ -50,26 +50,21 @@ public class StatementLine implements Comparable<StatementLine> {
 			availableBalance = Double.parseDouble(info[6].trim());
 		}
 
-		Category category = null;
-		if (info.length == 8) {
-			category = new Category(info[7].trim());
-		}
-
-		return new StatementLine(date, valueDate, description, draft, credit, accountingBalance, availableBalance, category);
+		return new StatementLine(date, valueDate, description, draft, credit, accountingBalance, availableBalance, null);
 	}
 
 	public StatementLine(Date date, Date valueDate, String description, double draft, double credit, double accountingBalance, double availableBalance, Category category) {
 		if (date == null || valueDate == null) {
-			throw new IllegalArgumentException("Date and valueDate cannot be null");
+			throw new IllegalArgumentException("O campo 'Date' ou 'Value Date' não pode ser nulo");
 		}
 		if (description == null || description.isEmpty()) {
-			throw new IllegalArgumentException("Description cannot be null or empty");
+			throw new IllegalArgumentException("O campo 'Description' não pode ser nulo ou vazio");
 		}
 		if (draft > 0) {
-			throw new IllegalArgumentException("Draft amount cannot be positive");
+			throw new IllegalArgumentException("O valor no campo 'Draft' não pode ser positivo");
 		}
 		if (credit < 0) {
-			throw new IllegalArgumentException("Credit amount cannot be negative");
+			throw new IllegalArgumentException("O valor no campo 'Credit' não pode ser negativo");
 		}
 
 		this.date = date;
@@ -123,7 +118,6 @@ public class StatementLine implements Comparable<StatementLine> {
 		return this.getDate().compareTo(o.getDate());
 	}
 
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -141,4 +135,5 @@ public class StatementLine implements Comparable<StatementLine> {
 				this.accountingBalance == o.getAccountingBalance() &&
 				this.availableBalance == o.getAvailableBalance();
 	}
+
 }

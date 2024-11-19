@@ -11,9 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Views {
-    // Methods static para mostrar as informações pedidas no terminal
 
-    private static final String separator1 = "---------------------------------------------------------------------------";
+    private static final String separator1 = "-------------------------------------------------------------------------------------";
     private static final String separator2 = "*****************************************************";
     private static final String lineBreaks = "\n\n";
 
@@ -36,8 +35,11 @@ public class Views {
         System.out.println("Saldo total: \t" + totalBalance);
 
         System.out.println();
-        System.out.println("Pressione 'ENTER' para regressar ao Menu Inicial");
-        PersonalFinanceManagerUserInterface.scanner.nextLine();
+        System.out.println("Introduza 'Q' para regressar ao Menu Inicial");
+        String input;
+        do {
+            input = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+        } while (!input.equals("Q"));
         System.out.println(lineBreaks);
         PersonalFinanceManagerUserInterface.mainMenu(accounts, categories);
     }
@@ -70,16 +72,19 @@ public class Views {
 
         System.out.println();
         System.out.println("Introduza 'E' para editar as categorias");
-        System.out.println("Pressione 'ENTER' para regressar ao Menu Movimentos de Conta");
+        System.out.println("Introduza 'Q' para regressar ao Menu Movimentos de Conta");
 
-        String userInput = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+        String input;
+        do {
+            input = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+            if (input.equals("E")) {
+                PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_ACCOUNT_STATEMENT, key);
+            } else if (input.equals("Q")){
+                PersonalFinanceManagerUserInterface.accountStatementChooseAccountMenu(accounts, categories);
+            }
+        } while (!input.equals("E") && !input.equals("Q"));
         System.out.println(lineBreaks);
 
-        if (userInput.equals("E")) {
-            PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_ACCOUNT_STATEMENT, key);
-        } else {
-            PersonalFinanceManagerUserInterface.accountStatementChooseAccountMenu(accounts, categories);
-        }
     }
 
 
@@ -112,8 +117,7 @@ public class Views {
                     }
                     double totalDrafts = account.totalForMonth(month, year);
                     double totalCredits = account.totalForMonthCredit(month, year);
-                    double monthlyBalance = Math.round((totalDrafts + totalCredits) * 100)/100.0;
-                    //double valorArredondado = Math.round(numero * Math.pow(10, casasDec)) / (Math.pow(10, casasDec));
+                    double monthlyBalance = Math.round((totalDrafts + totalCredits) * 100) / 100.0;
                     System.out.println("\t" + Month.values()[month] + " \t" + totalDrafts + " \t" + totalCredits + " \t" + monthlyBalance);
                 }
                 System.out.println();
@@ -123,8 +127,11 @@ public class Views {
         }
 
         System.out.println();
-        System.out.println("Pressione 'ENTER' para regressar ao Menu Análise");
-        PersonalFinanceManagerUserInterface.scanner.nextLine();
+        System.out.println("Introduza 'Q' para regressar ao Menu Análise");
+        String input;
+        do {
+            input = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+        } while (!input.equals("Q"));
         System.out.println(lineBreaks);
         PersonalFinanceManagerUserInterface.analysisMenu(accounts, categories);
     }
@@ -146,13 +153,18 @@ public class Views {
         System.out.println("Categoria \tDébitos até à data atual \tPrevisão de débitos até ao final do mês");
         for (Category category : categories) {
             double totalDraftsForCategory = account.totalDraftsForCategorySince(category, beginningOfMonth);
-            double totalPredictedDrafts = Math.round(totalDraftsForCategory / days * totalDays * 100)/100.0;
+            double totalPredictedDrafts = Math.round(totalDraftsForCategory / days * totalDays * 100) / 100.0;
             System.out.println(category.getName() + " \t" + totalDraftsForCategory + " \t" + totalPredictedDrafts);
         }
+        double totalDraftsNoCategory = account.totalDraftsNoCategorySince(beginningOfMonth);
+        System.out.println("SEM CATEGORIA \t" + totalDraftsNoCategory);
 
         System.out.println();
-        System.out.println("Pressione 'ENTER' para regressar ao Menu Seleção de Conta");
-        PersonalFinanceManagerUserInterface.scanner.nextLine();
+        System.out.println("Introduza 'Q' para regressar ao Menu Seleção de Conta");
+        String input;
+        do {
+            input = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+        } while (!input.equals("Q"));
         System.out.println(lineBreaks);
         PersonalFinanceManagerUserInterface.predictionPerCategoryChooseAccountMenu(accounts, categories);
     }
@@ -173,8 +185,11 @@ public class Views {
             System.out.println(account.getId() + " \t" + estimatedAverageBalance + " \t" + interestRate + " \t" + interests);
         }
         System.out.println();
-        System.out.println("Pressione 'ENTER' para regressar ao Menu Análise");
-        PersonalFinanceManagerUserInterface.scanner.nextLine();
+        System.out.println("Introduza 'Q' para regressar ao Menu Análise");
+        String input;
+        do {
+            input = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+        } while (!input.equals("Q"));
         System.out.println(lineBreaks);
         PersonalFinanceManagerUserInterface.analysisMenu(accounts, categories);
 
@@ -197,16 +212,18 @@ public class Views {
         }
 
         System.out.println("Introduza 'E' para editar as categorias");
-        System.out.println("Pressione 'ENTER' para regressar ao Menu Inicial");
-        String userInput = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+        System.out.println("Introduza 'Q' para regressar ao Menu Inicial");
+        String input;
+        do {
+            input = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
+            if (input.equals("E")) {
+                PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_LIST_CATEGORIES, 0);
+            } else if (input.equals("Q")) {
+                PersonalFinanceManagerUserInterface.mainMenu(accounts, categories);
+            }
+        } while (!input.equals("E") && !input.equals("Q"));
         System.out.println(lineBreaks);
-        if (userInput.equals("E")) {
-            PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_LIST_CATEGORIES, 0);
-        } else {
-            PersonalFinanceManagerUserInterface.mainMenu(accounts, categories);
-        }
     }
-
 
 
 }

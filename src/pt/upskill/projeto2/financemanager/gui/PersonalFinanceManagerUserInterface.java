@@ -210,14 +210,12 @@ public class PersonalFinanceManagerUserInterface {
             }
             // Atualizar as categorias das statementLines
             for (Long accountKey : accounts.keySet()) {
-                accounts.get(accountKey).removeCategoryFromStatement(categories, option, null);
+                accounts.get(accountKey).removeCategoryFromStatement(option, null);
             }
             editCategoryMenu(accounts, categories, categoryName, callingView, key);
         } else {
             deleteTagSelectionBox(accounts, categories, categoryName, callingView, key);
         }
-
-
     }
 
     public static void deleteCategoryConfirmationBox(Map<Long, Account> accounts, List<Category> categories, String categoryName, String callingView, long key) {
@@ -231,7 +229,7 @@ public class PersonalFinanceManagerUserInterface {
             }
             // Atualizar as categorias das statementLines
             for (Long accountKey : accounts.keySet()) {
-                accounts.get(accountKey).removeCategoryFromStatement(categories, null, categoryName);
+                accounts.get(accountKey).removeCategoryFromStatement(null, categoryName);
             }
             editCategoriesChooseCategoryMenu(accounts, categories, callingView, key);
         } else {
@@ -292,7 +290,7 @@ public class PersonalFinanceManagerUserInterface {
 
     public static String[] createOptionsAccountId(Map<Long, Account> accounts) {
         int numberOfAccounts = accounts.size();
-        String[] OPTIONS_ACCOUNT_ID = null;
+        String[] OPTIONS_ACCOUNT_ID;
         if (numberOfAccounts > 0) {
             OPTIONS_ACCOUNT_ID = new String[numberOfAccounts];
             int i = 0;

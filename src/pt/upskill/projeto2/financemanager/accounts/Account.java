@@ -3,20 +3,18 @@ package pt.upskill.projeto2.financemanager.accounts;
 import pt.upskill.projeto2.financemanager.accounts.formats.FileAccountFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.date.Date;
+import pt.upskill.projeto2.financemanager.filters.*;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public abstract class Account {
 
-    private long id;
+    private final long id;
     private String name;
     private String additionalInfo = "";
-    private String currency = "EUR";
+    private String currency;
     private String accountType;
 
     protected List<StatementLine> statements = new ArrayList<>();
@@ -40,7 +38,6 @@ public abstract class Account {
         String name = "";
         String additionalInfo = "";
         String accountType = "";
-        List<StatementLine> statements = readAccountStatements(file);
         String currrency = "";
 
         try {
@@ -64,8 +61,9 @@ public abstract class Account {
         }
 
         Account account;
+        List<StatementLine> statements = readAccountStatements(file);
         // Criar a conta de acordo com o tipo de conta que é
-        if (accountType.equals("DraftAccount")) {
+        if (accountType.equals(DraftAccount.ACCOUNT_TYPE)) {
             account = new DraftAccount(id, name, additionalInfo, statements, currrency, accountType);
         } else {
             account = new SavingsAccount(id, name, additionalInfo, statements, currrency, accountType);
@@ -81,13 +79,13 @@ public abstract class Account {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                if (line.split(";").length >= 7 && !line.startsWith("Date")) {
+                if (line.split(";").length == 7 && !line.startsWith("Date")) {
                     statementLines.add(line);
                 }
             }
             scanner.close();
         } catch (Exception e) {
-            System.out.println("Não foi possível ler o ficheiro");
+            System.out.println("Não foi possível ler os movimentos da conta");
         }
 
         for (String statementInfo : statementLines) {
@@ -104,7 +102,17 @@ public abstract class Account {
             printWriter.println(fileAccountFormat.format(account));
             printWriter.close();
         } catch (Exception e) {
-            System.out.println("Não foi possível escrever o ficheiro");
+            System.out.println("Não foi possível criar o ficheiro na pasta 'account_info'");
+        }
+    }
+
+    public void removeDuplicatedStatements() {
+        Iterator<StatementLine> iterator = statements.iterator();
+        while (iterator.hasNext()) {
+            StatementLine statementLine = iterator.next();
+            if (isDuplicatedStatement(statementLine)) {
+                iterator.remove();
+            }
         }
     }
 
@@ -119,16 +127,6 @@ public abstract class Account {
             return true;
         }
         return false;
-    }
-
-    public void removeDuplicatedStatements() {
-        Iterator<StatementLine> iterator = statements.iterator();
-        while (iterator.hasNext()) {
-            StatementLine statementLine = iterator.next();
-            if (isDuplicatedStatement(statementLine)) {
-                iterator.remove();
-            }
-        }
     }
 
     public long getId() {
@@ -193,56 +191,53 @@ public abstract class Account {
     public abstract double getInterestRate();
 
     public void addStatementLine(StatementLine statementLine) {
-        if (this.accountType.equals("SavingsAccount")) {
+        if (this.accountType.equals(SavingsAccount.ACCOUNT_TYPE)) {
             statementLine.setCategory(SavingsAccount.savingsCategory);
         }
         statements.add(statementLine);
     }
 
     public void removeStatementLinesBefore(Date date) {
-        List<StatementLine> toRemove = new ArrayList<>();
-        for (StatementLine statementLine : statements) {
-            if (statementLine.getDate().compareTo(date) < 0) {
-                toRemove.add(statementLine);
-            }
-        }
-        statements.removeAll(toRemove);
+        Filter<StatementLine, BeforeDateSelector> filter = new Filter<>(new BeforeDateSelector(date));
+        statements.removeAll(filter.apply(statements));
     }
 
     public double totalDraftsForCategorySince(Category category, Date date) {
+        List<StatementLine> statementsSince = new ArrayList<>(new Filter<>(new AfterDateSelector(date, true)).apply(statements));
+        List<StatementLine> statementsForCategorySince = new ArrayList<>(new Filter<>(new CategorySelector(category)).apply(statementsSince));
         double totalDrafts = 0.0;
-        for (StatementLine statementLine : statements) {
-            if (statementLine.getCategory() != null) {
-                if (statementLine.getCategory().getName().equals(category.getName()) && statementLine.getDate().compareTo(date) >= 0) {
-                    totalDrafts += statementLine.getDraft();
-                }
-            }
+        for (StatementLine statementLine : statementsForCategorySince) {
+            totalDrafts += statementLine.getDraft();
+        }
+        return totalDrafts;
+    }
+
+    public double totalDraftsNoCategorySince(Date date) {
+        List<StatementLine> statementsSince = new ArrayList<>(new Filter<>(new AfterDateSelector(date, true)).apply(statements));
+        List<StatementLine> statementsNoCategorySince = new ArrayList<>(new Filter<>(new NoCategorySelector()).apply(statementsSince));
+        double totalDrafts = 0.0;
+        for (StatementLine statementLine : statementsNoCategorySince) {
+            totalDrafts += statementLine.getDraft();
         }
         return totalDrafts;
     }
 
     public double totalForMonth(int month, int year) {
         // Somar os drafts do mês correspondente
+        List<StatementLine> monthStatements = new ArrayList<>(new Filter<>(new MonthSelector(month, year)).apply(statements));
         double totalForMonth = 0;
-        Date startOfMonth = new Date(1, month, year);
-        Date endOfMonth = Date.endOfMonth(startOfMonth);
-        for (StatementLine statementLine : statements) {
-            if (statementLine.getDate().compareTo(startOfMonth) >= 0 && statementLine.getDate().compareTo(endOfMonth) <= 0) {
-                totalForMonth += statementLine.getDraft();
-            }
+        for (StatementLine statementLine : monthStatements) {
+            totalForMonth += statementLine.getDraft();
         }
         return totalForMonth;
     }
 
     public double totalForMonthCredit(int month, int year) {
         // Somar os credits do mês correspondente
+        List<StatementLine> monthStatements = new ArrayList<>(new Filter<>(new MonthSelector(month, year)).apply(statements));
         double totalForMonthCredit = 0;
-        Date startOfMonth = new Date(1, month, year);
-        Date endOfMonth = Date.endOfMonth(startOfMonth);
-        for (StatementLine statementLine : statements) {
-            if (statementLine.getDate().compareTo(startOfMonth) >= 0 && statementLine.getDate().compareTo(endOfMonth) <= 0) {
-                totalForMonthCredit += statementLine.getCredit();
-            }
+        for (StatementLine statementLine : monthStatements) {
+            totalForMonthCredit += statementLine.getCredit();
         }
         return totalForMonthCredit;
     }
@@ -260,7 +255,7 @@ public abstract class Account {
         }
     }
 
-    public void removeCategoryFromStatement(List<Category> categories, String tag, String categoryName) {
+    public void removeCategoryFromStatement(String tag, String categoryName) {
         if (tag != null) {
             // Se for uma tag que foi removida
             for (StatementLine statementLine : statements) {

@@ -6,13 +6,13 @@ import pt.upskill.projeto2.financemanager.date.Date;
 import java.util.List;
 
 public class SavingsAccount extends Account{
-    // TODO
 
     public static Category savingsCategory = new Category("SAVINGS");
+    public static String ACCOUNT_TYPE = "SavingsAccount";
 
     public SavingsAccount(long id, String name) {
         super(id, name);
-        setAccountType("SavingsAccount");
+        setAccountType(ACCOUNT_TYPE);
     }
 
     public SavingsAccount(long id, String name, String additionalInfo, List<StatementLine> statements, String currency, String accountType) {
@@ -28,17 +28,5 @@ public class SavingsAccount extends Account{
     public double getInterestRate() {
         return BanksConstants.savingsInterestRate();
     }
-
-    @Override
-    public void autoCategorizeStatements(List<Category> categories) {
-        if (categories.isEmpty()) {
-            categories.add(savingsCategory);
-        }
-        // As contas poupança categorizam automaticamente todos os seus movimentos como "SAVINGS"
-        for (StatementLine statementLine : getStatements()) {
-            statementLine.setCategory(savingsCategory);
-        }
-    }
-
 
 }

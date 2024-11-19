@@ -1,16 +1,20 @@
 package pt.upskill.projeto2.financemanager.accounts;
 
 import pt.upskill.projeto2.financemanager.date.Date;
+import pt.upskill.projeto2.financemanager.filters.AfterDateSelector;
+import pt.upskill.projeto2.financemanager.filters.BeforeDateSelector;
+import pt.upskill.projeto2.financemanager.filters.Filter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DraftAccount extends Account{
-    //TODO
+
+    public static String ACCOUNT_TYPE = "DraftAccount";
 
     public DraftAccount(long id, String name) {
         super(id, name);
-        setAccountType("DraftAccount");
+        setAccountType(ACCOUNT_TYPE);
     }
 
     public DraftAccount(long id, String name, String additionalInfo, List<StatementLine> statements, String currency, String accountType) {
@@ -19,8 +23,6 @@ public class DraftAccount extends Account{
 
     @Override
     public double estimatedAverageBalance() {
-        // TODO corrigir método
-
         double estimatedAverageBalance = 0.0;
 
         if (!statements.isEmpty()) {
@@ -29,32 +31,24 @@ public class DraftAccount extends Account{
             Date beginningOfYear = new Date(1, 1, today.getYear());
 
             // Lista de movimentos anteriores ao início do ano
-            List<StatementLine> previousYearStatements = new ArrayList<>();
+            List<StatementLine> previousYearStatements = new ArrayList<>(new Filter<>(new BeforeDateSelector(beginningOfYear)).apply(statements));
             // Lista de movimentos deste ano
-            List<StatementLine> currentYearStatements = new ArrayList<>();
-            for (StatementLine statementLine : statements) {
-                if (statementLine.getDate().compareTo(beginningOfYear) < 0) {
-                    previousYearStatements.add(statementLine);
-                } else {
-                    currentYearStatements.add(statementLine);
-                }
-            }
+            List<StatementLine> currentYearStatements = new ArrayList<>(new Filter<>(new AfterDateSelector(beginningOfYear, true)).apply(statements));
 
             double sumAccountingBalance = 0;
-            double startingAccountingBalance;
 
             for (int i = 0; i < currentYearStatements.size() - 1; i++) {
                 if (i == 0) {
-                    // Accounting balance na conta desde o início do ano
                     if (!previousYearStatements.isEmpty()) {
-                        startingAccountingBalance = previousYearStatements.get(previousYearStatements.size()-1).getAccountingBalance();
+                        // Accounting balance na conta desde o início do ano, se este não for o primeiro ano de existência desta conta
+                        double startingAccountingBalance = previousYearStatements.get(previousYearStatements.size()-1).getAccountingBalance();
                         int diffInDays = currentYearStatements.get(i).getDate().diffInDays(beginningOfYear);
                         sumAccountingBalance += startingAccountingBalance * diffInDays;
                     }
                     double accountingBalance = currentYearStatements.get(i).getAvailableBalance();
                     int diffInDays = currentYearStatements.get(i).getDate().diffInDays(currentYearStatements.get(i + 1).getDate());
                     sumAccountingBalance += accountingBalance * diffInDays;
-                } else if (i != 0 && i != currentYearStatements.size() - 1){
+                } else if (i != currentYearStatements.size() - 1){
                     double accountingBalance = currentYearStatements.get(i).getAvailableBalance();
                     int diffInDays = currentYearStatements.get(i).getDate().diffInDays(currentYearStatements.get(i + 1).getDate());
                     sumAccountingBalance += accountingBalance * diffInDays;

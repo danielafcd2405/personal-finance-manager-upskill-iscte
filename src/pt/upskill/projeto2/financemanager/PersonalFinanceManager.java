@@ -1,17 +1,14 @@
 package pt.upskill.projeto2.financemanager;
 
 import pt.upskill.projeto2.financemanager.accounts.Account;
-import pt.upskill.projeto2.financemanager.accounts.StatementLine;
-import pt.upskill.projeto2.financemanager.accounts.formats.LongStatementFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
 
 import java.io.File;
 import java.util.*;
 
 public class PersonalFinanceManager {
-	// TODO
-    private Map<Long, Account> accounts = new HashMap<>();
-    private List<Category> categories = new ArrayList<>();
+    private final Map<Long, Account> accounts = new HashMap<>();
+    private final List<Category> categories = new ArrayList<>();
 
     public Map<Long, Account> getAccounts() {
         return accounts;
@@ -22,15 +19,27 @@ public class PersonalFinanceManager {
     }
 
     public PersonalFinanceManager() {
-        // TODO organizar e dividir em métodos mais pequenos
+        readAccountInfoFiles();
+        readStatementsFiles();
 
+        for (Long key : accounts.keySet()) {
+            // Ordenar cronologicamente os statements adicionados
+            Collections.sort(accounts.get(key).getStatements());
+            // Remover os statements duplicados
+            accounts.get(key).removeDuplicatedStatements();
+            // Categorizar automaticamente
+            accounts.get(key).autoCategorizeStatements(categories);
+        }
+
+    }
+
+    private void readAccountInfoFiles() {
         // Listar todos os nomes dos ficheiros na pasta account_info
         File[] files = null;
         try {
             File f = new File("account_info");
             files = f.listFiles();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Erro ao ler ficheiros na pasta 'account_info'");
         }
 
@@ -46,41 +55,30 @@ public class PersonalFinanceManager {
                 }
             }
         }
+    }
 
+    private void readStatementsFiles() {
         // Ler ficheiros da pasta statements
-        File[] filesStatements = null;
+        File[] files = null;
         try {
             File f = new File("statements");
-            filesStatements = f.listFiles();
-        }
-        catch (Exception e) {
+            files = f.listFiles();
+        } catch (Exception e) {
             System.out.println("Erro ao ler ficheiros na pasta 'statements'");
         }
 
-        if (filesStatements != null) {
-            for (File file2 : filesStatements) {
-                if (accounts.containsKey(readAccountID(file2))) {
+        if (files != null) {
+            for (File file : files) {
+                if (accounts.containsKey(readAccountID(file))) {
                     // Adicionar os statements à conta correspondente
-                    accounts.get(readAccountID(file2)).getStatements().addAll(Account.readAccountStatements(file2));
+                    accounts.get(readAccountID(file)).getStatements().addAll(Account.readAccountStatements(file));
                 } else {
                     // Se a conta não existir, criar uma conta nova
-                    Account account = Account.newAccount(file2);
+                    Account account = Account.newAccount(file);
                     accounts.put(account.getId(), account);
                 }
             }
         }
-
-        for (Long key : accounts.keySet()) {
-            // Ordenar cronologicamente os statements adicionados
-            Collections.sort(accounts.get(key).getStatements());
-            // Remover os statements duplicados
-            accounts.get(key).removeDuplicatedStatements();
-            // Categorizar automaticamente
-            accounts.get(key).autoCategorizeStatements(categories);
-        }
-
-
-
     }
 
 
@@ -100,7 +98,6 @@ public class PersonalFinanceManager {
         }
         return id;
     }
-
 
 
 }
