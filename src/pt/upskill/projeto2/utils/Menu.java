@@ -1,6 +1,6 @@
 package pt.upskill.projeto2.utils;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /**
  * @author upSkill 2020
@@ -25,10 +25,9 @@ public class Menu {
         return option;
     }
 
-    // Mostrar mensagens
-    // TODO
     public static void showMessage(String title, String message){
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.PLAIN_MESSAGE);
     }
+    
 
 }
