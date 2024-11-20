@@ -1,6 +1,7 @@
 package pt.upskill.projeto2.financemanager.accounts;
 
 import pt.upskill.projeto2.financemanager.accounts.formats.FileAccountFormat;
+import pt.upskill.projeto2.financemanager.accounts.formats.LongStatementFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.date.Date;
 import pt.upskill.projeto2.financemanager.filters.*;
@@ -95,6 +96,23 @@ public abstract class Account {
         return statements;
     }
 
+    public void addAllNewStatements(List<StatementLine> newStatements) {
+        for (StatementLine newStatement : newStatements) {
+            if (!isDuplicatedStatement(newStatement)) {
+                statements.add(newStatement);
+            }
+        }
+    }
+
+    public boolean isDuplicatedStatement(StatementLine statementLine) {
+        for (StatementLine statement : statements) {
+            if (statement.equals(statementLine)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void writeAccountInfo(Account account) {
         try {
             PrintWriter printWriter = new PrintWriter("account_info/" + account.getId() + ".csv");
@@ -106,27 +124,28 @@ public abstract class Account {
         }
     }
 
-    public void removeDuplicatedStatements() {
-        Iterator<StatementLine> iterator = statements.iterator();
+
+    public void removeIncoherentStatements() {
+        ListIterator<StatementLine> iterator = statements.listIterator();
         while (iterator.hasNext()) {
             StatementLine statementLine = iterator.next();
-            if (isDuplicatedStatement(statementLine)) {
+            if (!isCoherentWithPreviousStatement(statementLine)) {
                 iterator.remove();
             }
         }
     }
 
-    public boolean isDuplicatedStatement(StatementLine statementLine) {
-        int counter = 0;
-        for (StatementLine statement : statements) {
+    private boolean isCoherentWithPreviousStatement(StatementLine statementLine) {
+        boolean isCoherent = true;
+        for (int i = 1; i < statements.size(); i++) {
+            StatementLine statement = statements.get(i);
             if (statement.equals(statementLine)) {
-                counter++;
+                StatementLine previousStatement = statements.get(i - 1);
+                double predictedAccountingBalance = Math.round((previousStatement.getAccountingBalance() + (statement.getDraft() + statement.getCredit())) * 100) / 100.00;
+                isCoherent = statement.getAccountingBalance() == predictedAccountingBalance;
             }
         }
-        if (counter > 1) {
-            return true;
-        }
-        return false;
+        return isCoherent;
     }
 
     public long getId() {
@@ -183,7 +202,7 @@ public abstract class Account {
     public Date getEndDate() {
         Date endDate = null;
         if (!statements.isEmpty()) {
-            endDate = this.statements.get(this.statements.size()-1).getDate();
+            endDate = this.statements.get(this.statements.size() - 1).getDate();
         }
         return endDate;
     }
@@ -191,9 +210,6 @@ public abstract class Account {
     public abstract double getInterestRate();
 
     public void addStatementLine(StatementLine statementLine) {
-        if (this.accountType.equals(SavingsAccount.ACCOUNT_TYPE)) {
-            statementLine.setCategory(SavingsAccount.savingsCategory);
-        }
         statements.add(statementLine);
     }
 
@@ -272,7 +288,6 @@ public abstract class Account {
             }
         }
     }
-
 
 
 }

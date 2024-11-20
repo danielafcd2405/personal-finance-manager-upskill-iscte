@@ -25,8 +25,8 @@ public class PersonalFinanceManager {
         for (Long key : accounts.keySet()) {
             // Ordenar cronologicamente os statements adicionados
             Collections.sort(accounts.get(key).getStatements());
-            // Remover os statements duplicados
-            accounts.get(key).removeDuplicatedStatements();
+            // Remover os statements incoerentes
+            accounts.get(key).removeIncoherentStatements();
             // Categorizar automaticamente
             accounts.get(key).autoCategorizeStatements(categories);
         }
@@ -71,7 +71,7 @@ public class PersonalFinanceManager {
             for (File file : files) {
                 if (accounts.containsKey(readAccountID(file))) {
                     // Adicionar os statements à conta correspondente
-                    accounts.get(readAccountID(file)).getStatements().addAll(Account.readAccountStatements(file));
+                    accounts.get(readAccountID(file)).addAllNewStatements(Account.readAccountStatements(file));
                 } else {
                     // Se a conta não existir, criar uma conta nova
                     Account account = Account.newAccount(file);

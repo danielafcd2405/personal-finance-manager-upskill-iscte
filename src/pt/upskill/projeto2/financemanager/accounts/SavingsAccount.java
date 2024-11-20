@@ -29,4 +29,16 @@ public class SavingsAccount extends Account{
         return BanksConstants.savingsInterestRate();
     }
 
+    @Override
+    public void addStatementLine(StatementLine statementLine) {
+        statementLine.setCategory(SavingsAccount.savingsCategory);
+        super.addStatementLine(statementLine);
+    }
+
+    @Override
+    public void autoCategorizeStatements(List<Category> categories) {
+        for (StatementLine statementLine : statements) {
+            statementLine.setCategory(SavingsAccount.savingsCategory);
+        }
+    }
 }

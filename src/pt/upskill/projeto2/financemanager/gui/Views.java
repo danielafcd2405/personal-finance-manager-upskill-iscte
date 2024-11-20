@@ -78,12 +78,13 @@ public class Views {
         do {
             input = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
             if (input.equals("E")) {
+                System.out.println(lineBreaks);
                 PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_ACCOUNT_STATEMENT, key);
             } else if (input.equals("Q")){
+                System.out.println(lineBreaks);
                 PersonalFinanceManagerUserInterface.accountStatementChooseAccountMenu(accounts, categories);
             }
         } while (!input.equals("E") && !input.equals("Q"));
-        System.out.println(lineBreaks);
 
     }
 
@@ -217,12 +218,13 @@ public class Views {
         do {
             input = PersonalFinanceManagerUserInterface.scanner.nextLine().toUpperCase();
             if (input.equals("E")) {
+                System.out.println(lineBreaks);
                 PersonalFinanceManagerUserInterface.editCategoriesChooseCategoryMenu(accounts, categories, PersonalFinanceManagerUserInterface.OPT_LIST_CATEGORIES, 0);
             } else if (input.equals("Q")) {
+                System.out.println(lineBreaks);
                 PersonalFinanceManagerUserInterface.mainMenu(accounts, categories);
             }
         } while (!input.equals("E") && !input.equals("Q"));
-        System.out.println(lineBreaks);
     }
 
 
