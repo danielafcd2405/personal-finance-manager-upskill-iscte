@@ -101,7 +101,7 @@ public class PersonalFinanceManagerUserInterface {
         if (option != null) {
             switch (option) {
                 case OPT_MONTHLY_SUMMARY:
-                    Views.monthlySummaryView(accounts, categories);
+                    monthlySummaryChooseAccountMenu(accounts, categories);
                     break;
                 case OPT_PREDICTION_PER_CATEGORY:
                     predictionPerCategoryChooseAccountMenu(accounts, categories);
@@ -112,6 +112,17 @@ public class PersonalFinanceManagerUserInterface {
             }
         } else {
             mainMenu(accounts, categories);
+        }
+    }
+
+    public static void monthlySummaryChooseAccountMenu(Map<Long, Account> accounts, List<Category> categories) {
+        String option = Menu.requestSelection(OPT_MONTHLY_SUMMARY, createOptionsAccountId(accounts));
+        if (option != null && !option.isEmpty()) {
+            String[] s = option.split(" - ");
+            long key = Long.parseLong(s[0].trim());
+            Views.monthlySummaryView(accounts, categories, accounts.get(key));
+        } else {
+            analysisMenu(accounts, categories);
         }
     }
 
@@ -165,20 +176,23 @@ public class PersonalFinanceManagerUserInterface {
     }
 
     public static void addTagInputBox(Map<Long, Account> accounts, List<Category> categories, String categoryName, String callingView, long key) {
-        String tag = Menu.requestInput("Introduza a tag que deseja adicionar:").toUpperCase();
-        if (hasTagInCategoryList(categories, tag)) {
-            // Não pode adicionar uma tag que já está a ser usada
-            Menu.showMessage("Erro", "Essa tag já está a ser utilizada noutro sítio.");
-        } else {
-            for (Category category : categories) {
-                if (category.getName().equals(categoryName)) {
-                    category.addTag(tag);
+        String input = Menu.requestInput("Introduza a tag que deseja adicionar:");
+        if (input != null) {
+            String tag = input.toUpperCase();
+            if (hasTagInCategoryList(categories, tag)) {
+                // Não pode adicionar uma tag que já está a ser usada
+                Menu.showMessage("Erro", "Essa tag já está a ser utilizada noutro sítio.");
+            } else {
+                for (Category category : categories) {
+                    if (category.getName().equals(categoryName)) {
+                        category.addTag(tag);
+                    }
                 }
             }
-        }
-        // Atualizar as statementLines com a tag adicionada
-        for (Long accountKey : accounts.keySet()) {
-            accounts.get(accountKey).autoCategorizeStatements(categories);
+            // Atualizar as statementLines com a tag adicionada
+            for (Long accountKey : accounts.keySet()) {
+                accounts.get(accountKey).autoCategorizeStatements(categories);
+            }
         }
         editCategoryMenu(accounts, categories, categoryName, callingView, key);
     }
@@ -238,11 +252,14 @@ public class PersonalFinanceManagerUserInterface {
     }
 
     public static void addCategoryInputBox(Map<Long, Account> accounts, List<Category> categories, String callingView, long key) {
-        String newCategory = Menu.requestInput("Introduza o nome da categoria que deseja adicionar:").toUpperCase();
-        if (!categoryExists(categories, newCategory)) {
-            categories.add(new Category(newCategory));
-        } else {
-            Menu.showMessage("Erro", "Já existe uma categoria com esse nome.");
+        String input = Menu.requestInput("Introduza o nome da categoria que deseja adicionar:");
+        if (input != null) {
+            String newCategory = input.toUpperCase();
+            if (!categoryExists(categories, newCategory)) {
+                categories.add(new Category(newCategory));
+            } else {
+                Menu.showMessage("Erro", "Já existe uma categoria com esse nome.");
+            }
         }
         editCategoriesChooseCategoryMenu(accounts, categories, callingView, key);
     }
@@ -265,45 +282,45 @@ public class PersonalFinanceManagerUserInterface {
                 numberOfTagsInCategory = tagsInCategory.size();
             }
         }
-        String[] OPTIONS_TAGS = null;
-        if (tagsInCategory.isEmpty()) {
-            OPTIONS_TAGS = new String[1];
-            OPTIONS_TAGS[0] = "";
-        } else {
+        String[] optionsTags;
+        if (!tagsInCategory.isEmpty()) {
+            optionsTags = new String[numberOfTagsInCategory];
             for (int i = 0; i < numberOfTagsInCategory; i++) {
-                OPTIONS_TAGS = new String[numberOfTagsInCategory];
-                OPTIONS_TAGS[i] = tagsInCategory.get(i);
+                optionsTags[i] = tagsInCategory.get(i);
             }
+        } else {
+            optionsTags = new String[1];
+            optionsTags[0] = "";
         }
-        return OPTIONS_TAGS;
+        return optionsTags;
     }
 
     public static String[] createOptionsCategory(List<Category> categories) {
         int numberOfCategories = categories.size();
-        String[] OPTIONS_CATEGORY = new String[numberOfCategories + 1];
+        String[] optionsCategory = new String[numberOfCategories + 1];
         for (Category category : categories) {
-            OPTIONS_CATEGORY[categories.indexOf(category)] = category.getName();
+            optionsCategory[categories.indexOf(category)] = category.getName();
         }
-        OPTIONS_CATEGORY[OPTIONS_CATEGORY.length - 1] = OPT_ADD_CATEGORY;
-        return OPTIONS_CATEGORY;
+        optionsCategory[optionsCategory.length - 1] = OPT_ADD_CATEGORY;
+        return optionsCategory;
     }
 
     public static String[] createOptionsAccountId(Map<Long, Account> accounts) {
         int numberOfAccounts = accounts.size();
-        String[] OPTIONS_ACCOUNT_ID;
+        String[] optionsAccountId;
         if (numberOfAccounts > 0) {
-            OPTIONS_ACCOUNT_ID = new String[numberOfAccounts];
+            optionsAccountId = new String[numberOfAccounts];
             int i = 0;
             for (Long key : accounts.keySet()) {
                 String accountOption = key.toString() + " - " + accounts.get(key).getName();
-                OPTIONS_ACCOUNT_ID[i] = accountOption;
+                optionsAccountId[i] = accountOption;
                 i++;
             }
         } else {
-            OPTIONS_ACCOUNT_ID = new String[1];
-            OPTIONS_ACCOUNT_ID[0] = "";
+            optionsAccountId = new String[1];
+            optionsAccountId[0] = "";
         }
-        return OPTIONS_ACCOUNT_ID;
+        return optionsAccountId;
     }
 
 
